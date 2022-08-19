@@ -42,7 +42,9 @@ class Echargement():
         for row in soup.findAll('tr'):
             aux = row.findAll('td')
             if str_to_search in aux[0].text:
-                return re.sub('[^0-9,]', "", aux[1].text)
+                balance = re.sub('[^0-9,]', "", aux[1].text)
+                break
+        return float(balance.replace(',', '.'))
 
     def get_account_balance(self):
         """
