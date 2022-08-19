@@ -1,0 +1,34 @@
+[
+    {
+        "balance_date": "2022-08-01",
+        "balance_amount": 80
+    },
+    {
+        "balance_date": "2022-08-02",
+        "balance_amount": 74
+    },
+    {
+        "balance_date": "2022-08-03",
+        "balance_amount": 68
+    },
+    {
+        "balance_date": "2022-08-04",
+        "balance_amount": 50
+    },
+    {
+        "balance_date": "2022-08-05",
+        "balance_amount": 36
+    },
+    {
+        "balance_date": "2022-08-06",
+        "balance_amount": 35
+    },
+    {
+        "balance_date": "2022-08-07",
+        "balance_amount": 35
+    }
+
+
+]
+
+
