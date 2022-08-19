@@ -1,15 +1,20 @@
+#!/usr/bin/env python
 
+import json
 
 class Echargement():
 
     def __init__(self,
-                 badge_name,
-                 badge_number):
+                 fullname: str,
+                 badge: str,
+                 url: str,
+                 json_path: str
+                 ):
 
-        self.badge_name = badge_name
-        self.badge_number = badge_number
-        self.site_url = "https://www.e-chargement.com/api/libertis/"
-        self.json_database = "balance.json"
+        self.fullname = fullname
+        self.badge = badge
+        self.json_path = json_path
+        self.url = url
 
     def get_account_page(self):
         import mechanize
@@ -17,10 +22,10 @@ class Echargement():
         Get account page
         """
         browser = mechanize.Browser()
-        browser.open(self.site_url)
+        browser.open(self.url)
         browser.select_form(nr=0)
-        browser.form['badge_number'] = self.badge_number
-        browser.form['badge_nom'] = self.badge_name
+        browser.form['badge_number'] = self.badge
+        browser.form['badge_nom'] = self.fullname
         browser.submit()
 
         return browser.response().read()
@@ -47,24 +52,44 @@ class Echargement():
         return self.find_account_balance(html)
 
     def save_account_balance(self, balance):
-        import json
         import datetime
 
-        date = datetime.datetime.now().strftime("%Y-%m-%d")
+        today = datetime.datetime.now().strftime("%Y-%m-%d")
+        balance_history = self.get_account_balance_history()
+        balance_history[today] = balance
 
-        with open(self.json_database, "r") as jsonFile:
-            data = json.load(jsonFile)
-
-        data[date] = balance
-
-        with open(self.json_database, "w") as jsonFile:
-            json.dump(data, jsonFile,  ensure_ascii=False, indent=4)
+        with open(self.json_path, "w") as jsonFile:
+            json.dump(balance_history, jsonFile,  ensure_ascii=False, indent=4)
 
     def get_account_balance_history(self):
-        import json
-        with open(self.json_database, "r") as jsonFile:
+
+        with open(self.json_path, "r") as jsonFile:
             data = json.load(jsonFile)
 
         return data
 
+def script_args():
+    import argparse
+    args = argparse.ArgumentParser(description="Get your balance and save it to json")
+    args.add_argument("--badge", help="Your badge number", required=True)
+    args.add_argument("--fullname", help="Your fullname (DOE John)", required=True)
+    args.add_argument("--url", help="Url of your echargement (specific for each company)", required=True)
+    args.add_argument("--save-path", help="Json file path", default="balance.json")
 
+    return args.parse_args()
+
+def main():
+    args = script_args()
+
+    echargement = Echargement(
+        args.fullname,
+        args.badge,
+        args.url,
+        args.save_path
+        )
+
+    balance = echargement.get_account_balance()
+    echargement.save_account_balance(balance)
+
+if __name__ == "__main__":
+    main()
