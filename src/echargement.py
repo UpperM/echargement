@@ -2,6 +2,7 @@
 
 import json
 
+
 class Echargement():
 
     def __init__(self,
@@ -70,15 +71,35 @@ class Echargement():
 
         return data
 
+
 def script_args():
     import argparse
-    args = argparse.ArgumentParser(description="Get your balance and save it to json")
-    args.add_argument("--badge", help="Your badge number", required=True)
-    args.add_argument("--fullname", help="Your fullname (DOE John)", required=True)
-    args.add_argument("--url", help="Url of your echargement (specific for each company)", required=True)
-    args.add_argument("--save-path", help="Json file path", default="balance.json")
+    args = argparse.ArgumentParser(
+        description="Get your balance and save it to json"
+        )
+    args.add_argument(
+        "--badge",
+        help="Your badge number",
+        required=True
+        )
+    args.add_argument(
+        "--fullname",
+        help="Your fullname (DOE John)",
+        required=True
+        )
+    args.add_argument(
+        "--url",
+        help="Url of your echargement (specific for each company)",
+        required=True
+        )
+    args.add_argument(
+        "--save-path",
+        help="Json file path",
+        default="balance.json"
+        )
 
     return args.parse_args()
+
 
 def main():
     args = script_args()
@@ -92,6 +113,7 @@ def main():
 
     balance = echargement.get_account_balance()
     echargement.save_account_balance(balance)
+
 
 if __name__ == "__main__":
     main()
