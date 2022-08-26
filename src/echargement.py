@@ -56,9 +56,9 @@ class Echargement():
     def save_account_balance(self, balance):
         import datetime
 
-        today = datetime.datetime.now().strftime("%Y-%m-%d")
+        yesterday = (datetime.datetime.now() - datetime.timedelta(1)).strftime("%Y-%m-%d")
         balance_history = self.get_account_balance_history()
-        balance_history[today] = balance
+        balance_history[yesterday] = balance
 
         with open(self.json_path, "w") as jsonFile:
             json.dump(balance_history, jsonFile,  ensure_ascii=False, indent=4)
