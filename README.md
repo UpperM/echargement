@@ -10,7 +10,7 @@ It will save the result to balance.json
 
 ```json
 {
-    "2022-08-19": "6,82"
+    "2022-08-19": 6.82
 }
 ```
 
