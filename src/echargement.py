@@ -2,6 +2,7 @@
 
 import json
 import os
+import re
 
 
 class Echargement():
@@ -17,6 +18,7 @@ class Echargement():
         self.badge = badge
         self.json_path = json_path
         self.url = url
+        self.account_page = self.get_account_page()
 
     def get_account_page(self):
         import mechanize
@@ -32,35 +34,43 @@ class Echargement():
 
         return browser.response().read()
 
-    def find_account_balance(self, html):
+    def find_text_in_html_table(self, td_to_find: str):
         from bs4 import BeautifulSoup
-        import re
-        """
-        Parse amount
-        """
-        soup = BeautifulSoup(html, features="html5lib")
-        str_to_search = "Solde disponible sur votre compte"
+        soup = BeautifulSoup(self.account_page, features="html5lib")
 
         for row in soup.findAll('tr'):
             aux = row.findAll('td')
-            if str_to_search in aux[0].text:
-                balance = re.sub('[^0-9,]', "", aux[1].text)
-                break
-        return float(balance.replace(',', '.'))
+            if td_to_find in aux[0].text:
+                return aux[1].text
+
+        return None
+
+    def get_account_balance_date(self):
+        from datetime import datetime
+
+        find_date = self.find_text_in_html_table("Date du solde")
+
+        balance_date_str = find_date.split(" ")[0]
+
+        return datetime.strptime(balance_date_str, "%d/%m/%y")
 
     def get_account_balance(self):
         """
-        Get account amount
+        Parse amount
         """
-        html = self.get_account_page()
-        return self.find_account_balance(html)
+        str_to_search = "Solde disponible sur votre compte"
+        find_balance = self.find_text_in_html_table(str_to_search)
+        balance = re.sub('[^0-9,]', "", find_balance)
 
-    def save_account_balance(self, balance):
-        import datetime
+        return float(balance.replace(',', '.'))
 
-        yesterday = (datetime.datetime.now() - datetime.timedelta(1)).strftime("%Y-%m-%d")
+    def save_account_balance(self, balance: float):
+
+        current_balance_date = self.get_account_balance_date()
+        current_balance_date = current_balance_date.strftime("%Y-%m-%d")
+
         balance_history = self.get_account_balance_history()
-        balance_history[yesterday] = balance
+        balance_history[current_balance_date] = balance
 
         with open(self.json_path, "w") as jsonFile:
             json.dump(balance_history, jsonFile,  ensure_ascii=False, indent=4)
