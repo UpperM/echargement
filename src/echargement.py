@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import json
+import os
 
 
 class Echargement():
@@ -103,6 +104,11 @@ def script_args():
 
 def main():
     args = script_args()
+
+    # If save_path file doesn't exist, create it
+    if not os.path.exists(args.save_path):
+        with open(args.save_path, 'w+') as file:
+            file.write('{}')
 
     echargement = Echargement(
         args.fullname,
